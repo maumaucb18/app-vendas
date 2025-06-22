@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Vendas</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <header>
+        <h1>Vendas de Bebidas</h1>
+        <nav>
+            <a href="historico.html">📜 Histórico</a>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Produtos</h2>
+            <button onclick="createProduct()">➕ Novo Produto</button>
+            <div id="product-list" class="product-grid"></div>
+        </section>
+
+        <section>
+            <h2>Pedido Atual</h2>
+            <ul id="cart-list"></ul>
+            <button onclick="finalizeSale()">🧾 Finalizar Venda</button>
+        </section>
+    </main>
+
+    <div id="message-container"></div>
+
+    <footer>
+        <p>&copy; 2025 - Controle de Vendas</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

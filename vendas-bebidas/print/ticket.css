@@ -1,0 +1,23 @@
+body {
+    font-family: monospace;
+    background: white;
+    color: black;
+    width: 300px;
+}
+
+h2 {
+    text-align: center;
+    border-bottom: 1px dashed black;
+    margin-bottom: 10px;
+}
+
+#ticket-content div {
+    margin-bottom: 5px;
+}
+
+strong {
+    display: block;
+    border-top: 1px dashed black;
+    margin-top: 10px;
+    padding-top: 5px;
+}
