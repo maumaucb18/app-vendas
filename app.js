@@ -1,15 +1,32 @@
-// Dados
 let products = JSON.parse(localStorage.getItem('products')) || [];
 let sales = JSON.parse(localStorage.getItem('sales')) || [];
-let currentSale = [];
+let currentSale = JSON.parse(localStorage.getItem('currentSale')) || [];
+sales = Array.isArray(sales) ? sales : [];
+products = Array.isArray(products) ? products : [];
 
-// Salvar no LocalStorage
+
+// função auxiliar para prevenir erros
+function safeParse(json) {
+    try {
+        return JSON.parse(json) || [];
+    } catch (e) {
+        console.error('Erro ao analisar JSON:', e);
+        return [];
+    }
+}
+// Função para salvar dados
 function save() {
-    localStorage.setItem('products', JSON.stringify(products));
-    localStorage.setItem('sales', JSON.stringify(sales));
+    try {
+        localStorage.setItem('products', JSON.stringify(products));
+        localStorage.setItem('sales', JSON.stringify(sales));
+        localStorage.setItem('currentSale', JSON.stringify(currentSale));
+    } catch (e) {
+        console.error('Erro ao salvar dados:', e);
+        showMessage('Erro ao salvar dados!');
+    }
 }
 
-// Feedback Visual
+// Feedback visual
 function showMessage(message) {
     const msg = document.createElement('div');
     msg.textContent = message;
@@ -18,7 +35,7 @@ function showMessage(message) {
     setTimeout(() => msg.remove(), 2000);
 }
 
-// ---------------- Página de Venda ---------------- //
+// ---------------- Página Vendas ---------------- //
 
 if (document.getElementById('product-list')) {
     renderProducts();
@@ -35,8 +52,8 @@ function renderProducts() {
             <h3>${p.name}</h3>
             <div class="price">R$ ${p.price.toFixed(2)}</div>
             <div class="buttons">
-                <button onclick="addToCart(${index})">➕</button>
-                <button onclick="editProduct(${index})">📝</button>
+                <button onclick="addToCart(${index})">Adicionar</button>
+                <button onclick="editProduct(${index})">Editar</button>
             </div>
         `;
         productList.appendChild(div);
@@ -55,7 +72,7 @@ function createProduct() {
 }
 
 function editProduct(index) {
-    const action = prompt('Digite "1" para editar ou "2" para excluir o produto:');
+    const action = prompt('Digite "1" para editar ou "2" para excluir:');
     if (action === '1') {
         const name = prompt('Novo nome:', products[index].name);
         const price = parseFloat(prompt('Novo preço:', products[index].price));
@@ -66,7 +83,7 @@ function editProduct(index) {
             showMessage('Produto atualizado ✔️');
         }
     } else if (action === '2') {
-        if (confirm('Deseja realmente excluir este produto?')) {
+        if (confirm('Deseja excluir este produto?')) {
             products.splice(index, 1);
             save();
             renderProducts();
@@ -94,16 +111,26 @@ function removeFromCart(index) {
 function renderCart() {
     const cartList = document.getElementById('cart-list');
     if (!cartList) return;
+
     cartList.innerHTML = '';
+    let total = 0;
+
     currentSale.forEach((p, index) => {
         const li = document.createElement('li');
         li.className = 'cart-item';
         li.innerHTML = `
             ${p.name} ${p.note ? `(${p.note})` : ''} - R$ ${p.price.toFixed(2)}
-            <button onclick="removeFromCart(${index})">➖</button>
+            <button onclick="removeFromCart(${index})">Remover</button>
         `;
         cartList.appendChild(li);
+        total += p.price;
     });
+    if (currentSale.length > 0) {
+        const totalLi = document.createElement('li');
+        totalLi.className = 'cart-item total';
+        totalLi.innerHTML = `<strong>Total: R$ ${total.toFixed(2)}</strong>`;
+        cartList.appendChild(totalLi);
+    }
 }
 
 function finalizeSale() {
@@ -114,10 +141,12 @@ function finalizeSale() {
     const now = new Date();
     const timestamp = now.toLocaleString();
 
-    sales.push({
+    const saleRecord = {
         items: [...currentSale],
         date: timestamp
-    });
+    };
+
+    sales.push(saleRecord);
 
     printTicket(currentSale, timestamp);
 
@@ -126,6 +155,7 @@ function finalizeSale() {
     renderCart();
     showMessage('Venda finalizada ✔️');
 }
+
 
 // Ticket Impressão
 function printTicket(sale, timestamp) {
@@ -152,7 +182,6 @@ function printTicket(sale, timestamp) {
 if (document.getElementById('history-list')) {
     renderHistory();
 }
-
 function renderHistory() {
     const historyList = document.getElementById('history-list');
     const totalSales = document.getElementById('total-sales');
@@ -160,15 +189,24 @@ function renderHistory() {
 
     let grandTotal = 0;
 
+    if (!sales || sales.length === 0) {
+        historyList.innerHTML = '<li>Sem vendas registradas.</li>';
+        totalSales.textContent = 'Total Geral: R$ 0,00';
+        return;
+    }
+
     sales.forEach((sale, index) => {
-        const total = sale.items.reduce((sum, p) => sum + p.price, 0);
+        // Verifica se sale e sale.items existem
+        const items = Array.isArray(sale.items) ? sale.items : [];
+
+        const total = items.reduce((sum, p) => sum + (p.price || 0), 0);
         grandTotal += total;
 
         const li = document.createElement('li');
         li.innerHTML = `
             <strong>Venda ${index + 1}</strong><br>
-            Data: ${sale.date}<br>
-            Itens: ${sale.items.map(p => `${p.name}${p.note ? ` (${p.note})` : ''}`).join(', ')}<br>
+            Data: ${sale.date || 'Data não registrada'}<br>
+            Itens: ${items.map(p => `${p.name}${p.note ? ` (${p.note})` : ''}`).join(', ') || 'Nenhum item'}<br>
             Total: R$ ${total.toFixed(2)}
         `;
         historyList.appendChild(li);
@@ -177,6 +215,40 @@ function renderHistory() {
     totalSales.textContent = `Total Geral: R$ ${grandTotal.toFixed(2)}`;
 }
 
+
+
 function printHistory() {
     window.print();
+}
+// Adicionar registro do Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('SW registrado!'))
+            .catch(err => console.error('Erro SW:', err));
+    });
+}
+// função auxiliar para o carregamento inicial:
+document.addEventListener('DOMContentLoaded', function () {
+    if (document.getElementById('product-list')) {
+        renderProducts();
+        renderCart();
+    }
+
+    if (document.getElementById('history-list')) {
+        renderHistory();
+    }
+});
+// função para excluir vendas no histórico:
+function deleteSale(index) {
+    if (confirm('Excluir esta venda do histórico?')) {
+        const sales = JSON.parse(localStorage.getItem('sales')) || [];
+        
+        if (index >= 0 && index < sales.length) {
+            sales.splice(index, 1);
+            localStorage.setItem('sales', JSON.stringify(sales));
+            renderHistory();
+            showMessage('Venda excluída ✔️');
+        }
+    }
 }

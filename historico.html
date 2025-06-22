@@ -6,24 +6,24 @@
     <title>Histórico de Vendas</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body onload="renderHistory()">
     <header>
         <h1>Histórico de Vendas</h1>
         <nav>
-            <a href="index.html">🏠 Voltar</a>
+            <a href="index.html">Voltar ao Cardápio</a>
         </nav>
     </header>
 
     <main>
         <ul id="history-list"></ul>
         <p id="total-sales"></p>
-        <button onclick="printHistory()">🖨️ Imprimir Histórico</button>
+        <button class="finalizar" onclick="printHistory()">Imprimir Histórico</button>
     </main>
 
     <div id="message-container"></div>
 
     <footer>
-        <p>&copy; 2025 - Controle de Vendas</p>
+        <p>&copy; GP Promotora de Eventos todos direitos reservados</p>
     </footer>
 
     <script src="app.js"></script>

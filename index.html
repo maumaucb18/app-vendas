@@ -3,36 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Vendas</title>
+    <title>Cardápio | Vendas</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
     <header>
-        <h1>Vendas de Bebidas</h1>
+        <h1>Cardápio de Bebidas</h1>
         <nav>
-            <a href="historico.html">📜 Histórico</a>
+            <a href="historico.html">Histórico</a>
         </nav>
     </header>
 
     <main>
         <section>
-            <h2>Produtos</h2>
-            <button onclick="createProduct()">➕ Novo Produto</button>
+            <div class="menu-header">
+                <h2>Produtos</h2>
+                <button onclick="createProduct()">Novo Produto</button>
+            </div>
             <div id="product-list" class="product-grid"></div>
         </section>
 
         <section>
             <h2>Pedido Atual</h2>
             <ul id="cart-list"></ul>
-            <button onclick="finalizeSale()">🧾 Finalizar Venda</button>
+            <button class="finalizar" onclick="finalizeSale()">Finalizar Venda</button>
         </section>
     </main>
 
     <div id="message-container"></div>
 
     <footer>
-        <p>&copy; 2025 - Controle de Vendas</p>
+        <p> &copy; GP Promotora de Eventos </p>
     </footer>
 
     <script src="app.js"></script>
