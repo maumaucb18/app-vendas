@@ -8,9 +8,11 @@
 
 body {
     font-family: monospace, 'Courier New', Courier;
+    font-size: 12px;
+    line-height: 1.2;
     background-color: white;
     color: black;
-    width: 58mm;
+    width: 80mm;
     margin: 0 auto;
     padding: 10px;
 }
